@@ -1565,6 +1565,7 @@ class Wallet(object):
 
     def __repr__(self):
         db_uri = '' if not self.db_uri else self.db_uri.split('?')[0]
+
         if DEFAULT_DATABASE in db_uri:
             return "<Wallet(name=\"%s\")>" % self.name
         return "<Wallet(name=\"%s\", db_uri=\"%s\")>" % \
