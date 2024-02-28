@@ -3873,7 +3873,7 @@ class Wallet(object):
 
     def transaction_create(self, output_arr, input_arr=None, input_key_id=None, account_id=None, network=None, fee=None,
                            min_confirms=1, max_utxos=None, locktime=0, number_of_change_outputs=1,
-                           random_output_order=True, replace_by_fee=False):
+                           random_output_order=True, replace_by_fee=False, change_address=None):
         """
         Create new transaction with specified outputs.
 
@@ -4117,7 +4117,15 @@ class Wallet(object):
                                   "or lower fees")
 
             if self.scheme == 'single':
-                change_keys = [self.get_key(account_id, self.witness_type, network, change=1)]
+                if change_address:
+                    ch_key = (
+                        self._session.query(DbKey)
+                        .filter(DbKey.address.in_([change_address]))
+                        .all()
+                    )
+                    change_keys = [key for key in ch_key]
+                else:
+                    change_keys = [self.get_key(account_id=account_id, network=network, change=1)]
             else:
                 change_keys = self.get_keys(account_id, self.witness_type, network, change=1,
                                             number_of_keys=number_of_change_outputs)
