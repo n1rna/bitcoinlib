@@ -53,12 +53,9 @@ class BitcoindClient(BaseClient):
     """
 
     @staticmethod
-    @deprecated
-    def from_config(configfile=None, network='bitcoin', **kwargs):
+    def from_config(configfile=None, network='bitcoin', *args):
         """
         Read settings from bitcoind config file
-
-        Obsolete: does not work anymore, passwords are not stored in bitcoin config, only hashed password.
 
         :param configfile: Path to config file. Leave empty to look in default places
         :type: str
@@ -116,7 +113,7 @@ class BitcoindClient(BaseClient):
         server = _read_from_config(config, 'rpc', 'externalip', server)
 
         url = "http://%s:%s@%s:%s" % (config.get('rpc', 'rpcuser'), config.get('rpc', 'rpcpassword'), server, port)
-        return BitcoindClient(network, url, **kwargs)
+        return BitcoindClient(network, url, *args)
 
     def __init__(self, network='bitcoin', base_url='', denominator=100000000, *args):
         """
@@ -132,7 +129,6 @@ class BitcoindClient(BaseClient):
         if isinstance(network, Network):
             network = network.name
         if not base_url:
-            _logger.warning("Please provide rpc connection url to bitcoind node")
             bdc = self.from_config('', network)
             base_url = bdc.base_url
             network = bdc.network
@@ -336,9 +332,12 @@ if __name__ == '__main__':
 
     from pprint import pprint
 
-    # Connect by specifying connection URL
-    base_url = 'http://bitcoinrpc:passwd@host:8332'
-    bdc = BitcoindClient(base_url=base_url)
+    # 1. Connect by specifying connection URL
+    # base_url = 'http://bitcoinrpc:passwd@host:8332'
+    # bdc = BitcoindClient(base_url=base_url)
+
+    # 2. Or connect using default settings or settings from config file
+    bdc = BitcoindClient()
 
     print("\n=== SERVERINFO ===")
     pprint(bdc.proxy.getnetworkinfo())
