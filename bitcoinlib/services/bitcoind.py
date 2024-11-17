@@ -253,7 +253,10 @@ class BitcoindClient(BaseClient):
         pres = ''
         try:
             pres = self.proxy.estimatesmartfee(blocks)
-            res = pres['feerate']
+            if "errors" in pres and pres["errors"][0] == "Insufficient data or no feerate found":
+                res = 0.00030000
+            else:
+                res = pres['feerate']
         except KeyError as e:
             _logger.info("bitcoind error: %s, %s" % (e, pres))
             res = self.proxy.estimatefee(blocks)
